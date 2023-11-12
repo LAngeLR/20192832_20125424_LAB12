@@ -1,10 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <style>
+        #tablaEquipos {
+            display: none;
+        }
+    </style>
+    <title>Lista de Equipos</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
+<main>
+    <div class="container px-4 py-5">
+        <h1 class="pb-2 border-bottom" id="tituloListaEquipos">Listas de Equipos</h1>
+        <div class="d-flex mt-3 mb-4">
+            <a class="btn btn-primary" id="btnNuevoEquipo" href="#">Lista Apertura</a>
+            <a class="btn btn-primary" id="btnRegresar" href="#">Lista Clausura</a>
+            <a class="btn btn-primary" id="btnTodo" href="#">Lista Acumulada</a>
+        </div>
 
+        <table class="table" id="tablaEquipos">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Equipo</th>
+                <th>Liga</th>
+                <th>P. Jugados</th>
+                <th>P. Ganados</th>
+                <th>P. Perdidos</th>
+                <th>P. Empatados</th>
+                <th>G. Favor</th>
+                <th>G. Contra</th>
+                <th>Puntos</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</main>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+    $(document).ready(function() {
+        function mostrarTabla() {
+            $("#tablaEquipos").show();
+        }
+
+        function ocultarTabla() {
+            $("#tablaEquipos").hide();
+        }
+
+        function sumarAcumulados(listaEquipos) {
+            var equiposAcumulados = [];
+
+            $.each(listaEquipos, function(index, equipo) {
+                var equipoAcumulado = equiposAcumulados.find(function(acumulado) {
+                    return acumulado.equipo.id === equipo.equipo.id;
+                });
+
+                if (equipoAcumulado) {
+
+                    equipoAcumulado.partidos_jugados += equipo.partidos_jugados;
+                    equipoAcumulado.partidos_ganados += equipo.partidos_ganados;
+                    equipoAcumulado.partidos_perdidos += equipo.partidos_perdidos;
+                    equipoAcumulado.partidos_empatados += equipo.partidos_empatados;
+                    equipoAcumulado.goles_favor += equipo.goles_favor;
+                    equipoAcumulado.goles_contra += equipo.goles_contra;
+                    equipoAcumulado.puntos += equipo.puntos;
+                } else {
+                    equiposAcumulados.push({
+                        equipo: equipo.equipo,
+                        liga: "Total",
+                        partidos_jugados: equipo.partidos_jugados,
+                        partidos_ganados: equipo.partidos_ganados,
+                        partidos_perdidos: equipo.partidos_perdidos,
+                        partidos_empatados: equipo.partidos_empatados,
+                        goles_favor: equipo.goles_favor,
+                        goles_contra: equipo.goles_contra,
+                        puntos: equipo.puntos
+                    });
+                }
+            });
+
+            return equiposAcumulados;
+        }
+
+        function mostrarEquipos(listaEquipos, titulo) {
+            $("#tablaEquipos tbody").empty();
+            $("#tituloListaEquipos").text(titulo);
+
+            $.each(listaEquipos, function(index, equipo) {
+                var fila = "<tr>";
+                fila += "<td>" + (index + 1) + "</td>";
+                fila += "<td>" + equipo.equipo.id + "</td>";
+                fila += "<td>" + equipo.liga + "</td>";
+                fila += "<td>" + equipo.partidos_jugados + "</td>";
+                fila += "<td>" + equipo.partidos_ganados + "</td>";
+                fila += "<td>" + equipo.partidos_perdidos + "</td>";
+                fila += "<td>" + equipo.partidos_empatados + "</td>";
+                fila += "<td>" + equipo.goles_favor + "</td>";
+                fila += "<td>" + equipo.goles_contra + "</td>";
+                fila += "<td>" + equipo.puntos + "</td>";
+                fila += "<td><a class='btn btn-primary' href='/product/edit?id=" + equipo.equipo.id + "'>Detalles</a></td>";
+                fila += "</tr>";
+
+                $("#tablaEquipos tbody").append(fila);
+            });
+
+            mostrarTabla();
+        }
+
+        ocultarTabla();
+
+        $("#btnNuevoEquipo").click(function() {
+            $.ajax({
+                type: 'GET',
+                url: "http://localhost:8000/api/liga",
+                success: function(response) {
+                    var equiposLiga1 = response.filter(function(equipo) {
+                        return equipo.liga === 1;
+                    });
+                    mostrarEquipos(equiposLiga1, "Lista de Equipos Apertura");
+                },
+                error: function(error) {
+                    console.log("Error al obtener los datos: " + error);
+                }
+            });
+        });
+
+        $("#btnRegresar").click(function() {
+            $.ajax({
+                type: 'GET',
+                url: "http://localhost:8000/api/liga",
+                success: function(response) {
+                    var equiposLiga2 = response.filter(function(equipo) {
+                        return equipo.liga === 2;
+                    });
+                    mostrarEquipos(equiposLiga2, "Lista de Equipos Clausura");
+                },
+                error: function(error) {
+                    console.log("Error al obtener los datos: " + error);
+                }
+            });
+        });
+
+        $("#btnTodo").click(function() {
+            $.ajax({
+                type: 'GET',
+                url: "http://localhost:8000/api/liga",
+                success: function(response) {
+                    var equiposAcumulados = sumarAcumulados(response);
+                    mostrarEquipos(equiposAcumulados, "Lista Acumulada");
+                },
+                error: function(error) {
+                    console.log("Error al obtener los datos: " + error);
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
