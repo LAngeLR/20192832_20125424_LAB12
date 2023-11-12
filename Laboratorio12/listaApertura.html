@@ -17,9 +17,9 @@
     <div class="container px-4 py-5">
         <h1 class="pb-2 border-bottom" id="tituloListaEquipos">Listas de Equipos</h1>
         <div class="d-flex justify-content-between mt-3 mb-4">
-            <a class="btn btn-primary" id="btnNuevoEquipo" href="#">Lista Apertura</a>
-            <a class="btn btn-primary" id="btnRegresar" href="#">Lista Clausura</a>
-            <a class="btn btn-primary" id="btnTodo" href="#">Lista Acumulada</a>
+            <a class="btn btn-primary" id="btnApertura" href="#">Lista Apertura</a>
+            <a class="btn btn-primary" id="btnClausura" href="#">Lista Clausura</a>
+            <a class="btn btn-primary" id="btnAcumulada" href="#">Lista Acumulada</a>
         </div>
 
 
@@ -118,39 +118,44 @@
 
         ocultarTabla();
 
-        $("#btnNuevoEquipo").click(function() {
+        $("#btnApertura").click(function() {
+            // Realizar la solicitud AJAX
             $.ajax({
+                url: 'http://localhost:8000/api/liga',
                 type: 'GET',
-                url: "http://localhost:8000/api/liga",
-                success: function(response) {
-                    var equiposLiga1 = response.filter(function(equipo) {
-                        return equipo.liga === 1;
-                    });
-                    mostrarEquipos(equiposLiga1, "Lista de Equipos Apertura");
+                dataType: 'json',
+                success: function (data) {
+                    // Filtrar equipos con liga = 1
+                    const equiposFiltrados = data.filter(equipo => equipo.liga === "1");
+
+                    // Llamar a la función mostrarEquipos con los datos filtrados
+                    mostrarEquipos(equiposFiltrados, 'Equipos de la Liga 1');
                 },
-                error: function(error) {
-                    console.log("Error al obtener los datos: " + error);
+                error: function (error) {
+                    console.log('Error al obtener los datos:', error);
+                }
+            });
+        });
+        $("#btnClausura").click(function() {
+            // Realizar la solicitud AJAX
+            $.ajax({
+                url: 'http://localhost:8000/api/liga',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Filtrar equipos con liga = 1
+                    const equiposFiltrados = data.filter(equipo => equipo.liga === "2");
+
+                    // Llamar a la función mostrarEquipos con los datos filtrados
+                    mostrarEquipos(equiposFiltrados, 'Equipos de la Liga 2');
+                },
+                error: function (error) {
+                    console.log('Error al obtener los datos:', error);
                 }
             });
         });
 
-        $("#btnRegresar").click(function() {
-            $.ajax({
-                type: 'GET',
-                url: "http://localhost:8000/api/liga",
-                success: function(response) {
-                    var equiposLiga2 = response.filter(function(equipo) {
-                        return equipo.liga === 2;
-                    });
-                    mostrarEquipos(equiposLiga2, "Lista de Equipos Clausura");
-                },
-                error: function(error) {
-                    console.log("Error al obtener los datos: " + error);
-                }
-            });
-        });
-
-        $("#btnTodo").click(function() {
+        $("#btnAcumulada").click(function() {
             $.ajax({
                 type: 'GET',
                 url: "http://localhost:8000/api/liga",
