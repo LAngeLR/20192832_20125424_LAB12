@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <style>
         #tablaEquipos {
             display: none;
@@ -16,11 +16,12 @@
 <main>
     <div class="container px-4 py-5">
         <h1 class="pb-2 border-bottom" id="tituloListaEquipos">Listas de Equipos</h1>
-        <div class="d-flex mt-3 mb-4">
+        <div class="d-flex justify-content-between mt-3 mb-4">
             <a class="btn btn-primary" id="btnNuevoEquipo" href="#">Lista Apertura</a>
             <a class="btn btn-primary" id="btnRegresar" href="#">Lista Clausura</a>
             <a class="btn btn-primary" id="btnTodo" href="#">Lista Acumulada</a>
         </div>
+
 
         <table class="table" id="tablaEquipos">
             <thead>
@@ -44,7 +45,7 @@
         </table>
     </div>
 </main>
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 <script>
     $(document).ready(function() {
         function mostrarTabla() {
@@ -106,7 +107,7 @@
                 fila += "<td>" + equipo.goles_favor + "</td>";
                 fila += "<td>" + equipo.goles_contra + "</td>";
                 fila += "<td>" + equipo.puntos + "</td>";
-                fila += "<td><a class='btn btn-primary' href='/product/edit?id=" + equipo.equipo.id + "'>Detalles</a></td>";
+                fila += "<td><a class='btn btn-warning' href='/product/edit?id=" + equipo.equipo.id + "'>Detalles</a></td>";
                 fila += "</tr>";
 
                 $("#tablaEquipos tbody").append(fila);
@@ -164,5 +165,6 @@
         });
     });
 </script>
+<script src="js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
